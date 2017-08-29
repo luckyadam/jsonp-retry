@@ -1,20 +1,22 @@
-import { isNative, serializeParams } from './util'
+import { isNative, serializeParams } from './lib'
 import assign from 'object-assign'
+
+const win = window
 
 const noop = function () {}
 
 const canUsePromise = (function () {
-  return 'Promise' in window && isNative(Promise)
+  return 'Promise' in win && isNative(Promise)
 })()
 
-const enc = encodeURIComponent
+const encodeC = encodeURIComponent
 const doc = document
 
 const defaultConfig = {
   timeout: 2000,
   retryTimes: 2,
   backup: null,
-  params: { },
+  params: {},
   jsonp: 'callback',
   jsonpCallback: null,
   needStore: false,
@@ -26,10 +28,10 @@ const defaultConfig = {
 
 function jsonp (url, opts, cb) {
   if (!url && (opts == null || typeof opts !== 'object' || typeof opts.url !== 'string')) {
-    throw new Error('Param url is needed!')
+    return cb(new Error('Param url is needed!'))
   }
   if (typeof url === 'object' && (url == null || typeof url.url !== 'string')) {
-    throw new Error('Param url is needed!')
+    return cb(new Error('Param url is needed!'))
   }
   if (typeof opts === 'function') {
     cb = opts
@@ -40,13 +42,16 @@ function jsonp (url, opts, cb) {
   }
   opts = assign({}, defaultConfig, opts)
   const backup = opts.backup
-  const charset = opts.charset
+  const charset = opts.scriptCharset
   const funcId = opts.jsonpCallback || `__jsonp${new Date().getTime()}`
-  let url = url || opts.url
-  const params = serializeParams(opts.params)
-  url += (~url.indexOf('?') ? '&' : '?') + `${opts.jsonp}=${enc(funcId)}&${params}`
+  url = url || opts.url
+  let params = serializeParams(opts.params)
+  if (params) {
+    params = `&${params}`
+  }
+  url += (~url.indexOf('?') ? '&' : '?') + `${opts.jsonp}=${encodeC(funcId)}${params}`
   url = url.replace('?&', '?')
-  window[funcId] = function (data) {
+  win[funcId] = function (data) {
     if (opts.dataCheck) {
       if (opts.dataCheck(data)) {
         cb(null, data)
@@ -63,12 +68,14 @@ function jsonp (url, opts, cb) {
 
 function appendScriptTagToHead ({ url, charset }) {
   const head = doc.head || doc.getElementsByTagName('head')[0]
-  const script = node = doc.createElement('script')
+  const script = doc.createElement('script')
   script.type = 'text/javascript'
   if (charset) {
     script.charset = charset
   }
   script.src = url
-  head.insertBefore(script, head.firstChild)
+  head.appendChild(script)
   return script
 }
+
+export default jsonp
