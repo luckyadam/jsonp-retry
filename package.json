@@ -2,13 +2,20 @@
   "name": "jsonp-retry",
   "version": "0.0.1",
   "description": "A simple jsonp with retry and storage",
-  "main": "index.js",
+  "main": "dist/jsonp-retry.js",
   "scripts": {
+    "clear": "rm -rf dist",
     "eslint": "eslint src test",
     "eslint:fix": "eslint src test --fix",
     "test:karma": "karma start karma.conf.js --single-run",
     "test:karma:watch": "npm run test:karma -- no-single-run",
-    "test": "npm run eslint && npm run test:karma"
+    "test": "npm-run-all eslint test:karma",
+    "build": "npm-run-all clear transpile optimize minify",
+    "transpile:main": "rollup -c rollup.config.js",
+    "transpile": "npm-run-all transpile:main",
+    "optimize": "uglifyjs dist/jsonp-retry.dev.js -c properties=false,conditionals=false,sequences=false,loops=false,join_vars=false,collapse_vars=false --pure-funcs=Object.defineProperty -b width=120,quote_style=3 -o dist/jsonp-retry.js -p relative --in-source-map dist/jsonp-retry.dev.js.map --source-map dist/jsonp-retry.js.map",
+    "minify": "uglifyjs dist/jsonp-retry.js -c properties=false,collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code -m -o dist/jsonp-retry.min.js -p relative --in-source-map dist/jsonp-retry.js.map --source-map dist/jsonp-retry.min.js.map",
+    "release": "npm run build && npm test && release-it -n -p"
   },
   "repository": {
     "type": "git",
@@ -26,6 +33,7 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es3-member-expression-literals": "^6.22.0",
     "babel-plugin-transform-es3-property-literals": "^6.22.0",
     "babel-preset-es2015": "^6.24.1",
@@ -49,7 +57,12 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
     "mocha": "^3.5.0",
+    "npm-run-all": "^4.1.1",
+    "release-it": "^2.8.5",
     "rollup": "^0.49.2",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "sinon": "^3.2.1",
     "sinon-chai": "^2.13.0",
     "webpack": "^3.5.5"
