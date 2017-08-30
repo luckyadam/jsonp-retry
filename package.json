@@ -4,7 +4,8 @@
   "description": "A simple jsonp with retry and storage",
   "main": "index.js",
   "scripts": {
-    "eslint": "eslint src",
+    "eslint": "eslint src test",
+    "eslint:fix": "eslint src test --fix",
     "test:karma": "karma start karma.conf.js --single-run",
     "test:karma:watch": "npm run test:karma -- no-single-run",
     "test": "npm run eslint && npm run test:karma"

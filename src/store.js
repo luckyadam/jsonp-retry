@@ -1,7 +1,5 @@
-const win = (typeof window != 'undefined' ? window : global)
-const doc = win.document
+const win = (typeof window !== 'undefined' ? window : global)
 const localStorageName = 'localStorage'
-const scriptTag = 'script'
 const storage = win[localStorageName]
 
 const store = {
@@ -48,8 +46,7 @@ const store = {
     }
     try {
       return JSON.parse(value)
-    }
-    catch (err) {
+    } catch (err) {
       return value || void 666
     }
   }

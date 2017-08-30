@@ -11,7 +11,10 @@ module.exports = {
   },
   globals: {
     describe: true,
-    it
+    it: true,
+    expect: true,
+    before: true,
+    after: true
   },
   rules: {
     'no-unused-expressions': 0,

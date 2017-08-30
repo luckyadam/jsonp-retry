@@ -1,6 +1,6 @@
 import assign from 'object-assign'
 
-import { isNative, serializeParams } from './lib'
+import { serializeParams } from './lib'
 import store from './store'
 
 const win = window
@@ -82,7 +82,7 @@ function fetchData (url, opts, cb) {
   const charset = opts.charset
   const funcId = opts.name || `__jsonp${new Date().getTime()}`
   url = generateJsonpUrlWithParams(url, opts.params)
-  url += `&${opts.jsonp}=${funcId}`
+  url += `&${opts.jsonp}=${encodeC(funcId)}`
   if (!opts.cache) {
     url += `&_=${new Date().getTime()}`
   }
@@ -95,7 +95,7 @@ function fetchData (url, opts, cb) {
       opts.retryTimes--
       return fetchData(url, opts, cb)
     }
-    if (false === fallback(originalUrl, opts, cb)) {
+    if (fallback(originalUrl, opts, cb) === false) {
       return cb(new Error('Timeout and no data return'))
     }
   }, timeout)
@@ -103,7 +103,7 @@ function fetchData (url, opts, cb) {
   win[funcId] = function (data) {
     cleanup(funcId)
     if (opts.dataCheck) {
-      if (false !== opts.dataCheck(data)) {
+      if (opts.dataCheck(data) !== false) {
         // write data to store
         setDataToStore({
           useStore: opts.useStore,
@@ -112,8 +112,7 @@ function fetchData (url, opts, cb) {
         })
         return cb(null, data)
       }
-      const backup = opts.backup
-      if (false === fallback(originalUrl, opts, cb)) {
+      if (fallback(originalUrl, opts, cb) === false) {
         cb(new Error('Data check error, and no fallback'))
       }
     } else {
@@ -145,7 +144,7 @@ function getDataFromStore ({ useStore, storeKey, storeCheck, storeCheckKey, stor
     const storeData = store.get(storeKey)
     storeCheck = storeCheck || storeCheckFn
     if (storeCheck(storeData, storeCheckKey, storeSign)) {
-      if (!dataCheck || (storeData && dataCheck && false !== dataCheck(storeData))) {
+      if (!dataCheck || (storeData && dataCheck && dataCheck(storeData) !== false)) {
         return storeData
       }
     }
@@ -157,7 +156,7 @@ function getDataFromStoreWithoutCheck ({ useStore, storeKey, dataCheck }) {
   useStore = useStore ? store.enabled : false
   if (useStore) {
     const storeData = store.get(storeKey)
-    if (!dataCheck || (storeData && dataCheck && false !== dataCheck(storeData))) {
+    if (!dataCheck || (storeData && dataCheck && dataCheck(storeData) !== false)) {
       return storeData
     }
   }

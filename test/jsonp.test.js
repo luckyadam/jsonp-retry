@@ -146,10 +146,10 @@ describe('jsonp', function () {
       backup: BACKUP_URL1
     }, function (err, data) {
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 1)
-        expect(data).to.have.deep.nested.property('data.count', 1)
-        expect(data).to.have.deep.nested.property('data.arr', [1])
-        done()
+      expect(data).to.have.deep.nested.property('code', 1)
+      expect(data).to.have.deep.nested.property('data.count', 1)
+      expect(data).to.have.deep.nested.property('data.arr', [1])
+      done()
     })
   })
 
@@ -169,10 +169,10 @@ describe('jsonp', function () {
       storeSign: 'yyyyy'
     }, function (err, data) {
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 1)
-        expect(data).to.have.deep.nested.property('version', 'yyyyy')
-        expect(data).to.have.deep.nested.property('data.arr', [1])
-        done()
+      expect(data).to.have.deep.nested.property('code', 1)
+      expect(data).to.have.deep.nested.property('version', 'yyyyy')
+      expect(data).to.have.deep.nested.property('data.arr', [1])
+      done()
     })
   })
 
@@ -191,10 +191,10 @@ describe('jsonp', function () {
       storeSign: 'hhhh'
     }, function (err, data) {
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 0)
-        expect(data).to.have.deep.nested.property('version', 'yyyyy')
-        expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
-        done()
+      expect(data).to.have.deep.nested.property('code', 0)
+      expect(data).to.have.deep.nested.property('version', 'yyyyy')
+      expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
+      done()
     })
   })
 
@@ -219,10 +219,10 @@ describe('jsonp', function () {
       }
     }, function (err, data) {
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 0)
-        expect(data).to.have.deep.nested.property('version', 'yyyyy')
-        expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
-        done()
+      expect(data).to.have.deep.nested.property('code', 0)
+      expect(data).to.have.deep.nested.property('version', 'yyyyy')
+      expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
+      done()
     })
   })
 
@@ -248,10 +248,10 @@ describe('jsonp', function () {
       }
     }, function (err, data) {
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 10)
-        expect(data).to.have.deep.nested.property('version', 'yyyyy')
-        expect(data).to.have.deep.nested.property('data.arr', [1])
-        done()
+      expect(data).to.have.deep.nested.property('code', 10)
+      expect(data).to.have.deep.nested.property('version', 'yyyyy')
+      expect(data).to.have.deep.nested.property('data.arr', [1])
+      done()
     })
   })
 
@@ -295,10 +295,10 @@ describe('jsonp', function () {
     }, function (err, data) {
       data = store.get(`${STORE_TEST_URL}?`)
       expect(err).to.not.exist
-        expect(data).to.have.deep.nested.property('code', 0)
-        expect(data).to.have.deep.nested.property('version', 'yyyyy')
-        expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
-        done()
+      expect(data).to.have.deep.nested.property('code', 0)
+      expect(data).to.have.deep.nested.property('version', 'yyyyy')
+      expect(data).to.have.deep.nested.property('data.arr', [1, 2, 3])
+      done()
     })
   })
 })
