@@ -83,6 +83,9 @@ function fetchData (url, opts, cb) {
   const funcId = opts.name || `__jsonp${new Date().getTime()}`
   url = generateJsonpUrlWithParams(url, opts.params)
   url += `&${opts.jsonp}=${funcId}`
+  if (!opts.cache) {
+    url += `&_=${new Date().getTime()}`
+  }
   const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
   // when timeout, will try to retry
   timer = setTimeout(() => {
