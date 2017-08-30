@@ -7,7 +7,7 @@ const webpack = require('webpack')
 const coverage = String(process.env.COVERAGE) !== 'false'
 const ci = String(process.env.CI).match(/^(1|true)$/gi)
 const realBrowser = String(process.env.BROWSER).match(/^(1|true)$/gi)
-const sauceLabs = realBrowser && ci
+const sauceLabs = false
 
 const sauceLabsLaunchers = {
   sl_win_chrome: {
