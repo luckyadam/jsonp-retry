@@ -27,11 +27,13 @@ const defaultConfig = {
 }
 
 function jsonp (url, opts, cb) {
-  if (!url && (opts == null || typeof opts !== 'object' || typeof opts.url !== 'string')) {
-    return cb(new Error('Param url is needed!'))
-  }
-  if (typeof url === 'object' && (url == null || typeof url.url !== 'string')) {
-    return cb(new Error('Param url is needed!'))
+  if (typeof url === 'function') {
+    cb = url
+    opts = {}
+  } else if (url && typeof url === 'object') {
+    cb = opts
+    opts = url || {}
+    url = opts.url
   }
   if (typeof opts === 'function') {
     cb = opts
@@ -41,10 +43,13 @@ function jsonp (url, opts, cb) {
     opts = {}
   }
   opts = assign({}, defaultConfig, opts)
+  url = url || opts.url
+  if (!url || typeof url !== 'string') {
+    return cb(new Error('Param url is needed!'))
+  }
   const backup = opts.backup
   const charset = opts.scriptCharset
   const funcId = opts.jsonpCallback || `__jsonp${new Date().getTime()}`
-  url = url || opts.url
   let params = serializeParams(opts.params)
   if (params) {
     params = `&${params}`
