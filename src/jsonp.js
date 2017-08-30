@@ -1,13 +1,11 @@
-import { isNative, serializeParams } from './lib'
 import assign from 'object-assign'
+
+import { isNative, serializeParams } from './lib'
+import store from './store'
 
 const win = window
 
 const noop = function () {}
-
-const canUsePromise = (function () {
-  return 'Promise' in win && isNative(Promise)
-})()
 
 const encodeC = encodeURIComponent
 const doc = document
@@ -22,11 +20,13 @@ const defaultConfig = {
   params: {},
   jsonp: 'callback',
   name: null,
-  needStore: false,
   cache: true,
+  useStore: false,
+  storeCheck: null,
   storeSign: null,
+  storeCheckKey: null,
   dataCheck: null,
-  scriptCharset: 'UTF-8'
+  charset: 'UTF-8'
 }
 
 let timer
@@ -50,26 +50,40 @@ function jsonp (url, opts, cb) {
   }
   opts = assign({}, defaultConfig, opts)
   url = url || opts.url
+  if (!url || typeof url !== 'string') {
+    return cb(new Error('Param url is needed!'))
+  }
+  const originalUrl = generateJsonpUrlWithParams(url, opts.params)
+  // first get data from store
+  const datafromStore = getDataFromStore({
+    useStore: opts.useStore,
+    storeKey: originalUrl,
+    storeCheck: opts.storeCheck,
+    storeCheckKey: opts.storeCheckKey,
+    storeSign: opts.storeSign,
+    dataCheck: opts.dataCheck
+  })
+  if (datafromStore) {
+    return cb(null, datafromStore)
+  }
+  opts.originalUrl = originalUrl
   fetchData(url, opts, cb)
 }
 
-function fetchData (url, opts, cb) {
-  if (!url || typeof url !== 'string') {
-    if (false === fallback(opts, cb)) {
-      return cb(new Error('Param url is needed!'))
-    }
-    return
-  }
-  const charset = opts.scriptCharset
-  const funcId = opts.name || `__jsonp${new Date().getTime()}`
-  let params = serializeParams(opts.params)
-  if (params) {
-    params = `&${params}`
-  }
-  url += (~url.indexOf('?') ? '&' : '?') + `${opts.jsonp}=${encodeC(funcId)}${params}`
+function generateJsonpUrlWithParams (url, params) {
+  params = typeof params === 'string' ? params : serializeParams(params)
+  url += (~url.indexOf('?') ? '&' : '?') + `${params}`
   url = url.replace('?&', '?')
-  const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
+  return url
+}
 
+function fetchData (url, opts, cb) {
+  const originalUrl = opts.originalUrl
+  const charset = opts.charset
+  const funcId = opts.name || `__jsonp${new Date().getTime()}`
+  url = generateJsonpUrlWithParams(url, opts.params)
+  url += `&${opts.jsonp}=${funcId}`
+  const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
   // when timeout, will try to retry
   timer = setTimeout(() => {
     cleanup(funcId)
@@ -78,7 +92,7 @@ function fetchData (url, opts, cb) {
       opts.retryTimes--
       return fetchData(url, opts, cb)
     }
-    if (false === fallback(opts, cb)) {
+    if (false === fallback(originalUrl, opts, cb)) {
       return cb(new Error('Timeout and no data return'))
     }
   }, timeout)
@@ -86,14 +100,26 @@ function fetchData (url, opts, cb) {
   win[funcId] = function (data) {
     cleanup(funcId)
     if (opts.dataCheck) {
-      if (opts.dataCheck(data)) {
+      if (false !== opts.dataCheck(data)) {
+        // write data to store
+        setDataToStore({
+          useStore: opts.useStore,
+          storeKey: originalUrl,
+          data
+        })
         return cb(null, data)
       }
       const backup = opts.backup
-      if (false === fallback(opts, cb)) {
+      if (false === fallback(originalUrl, opts, cb)) {
         cb(new Error('Data check error, and no fallback'))
       }
     } else {
+      // write data to store
+      setDataToStore({
+        useStore: opts.useStore,
+        storeKey: originalUrl,
+        data
+      })
       cb(null, data)
     }
   }
@@ -103,14 +129,66 @@ function fetchData (url, opts, cb) {
   })
 }
 
-function fallback (opts, cb) {
+function storeCheckFn (storeData, storeCheckKey, storeSign) {
+  if (storeData && storeCheckKey && storeSign) {
+    return storeData[storeCheckKey] && storeData[storeCheckKey] === storeSign
+  }
+  return false
+}
+
+function getDataFromStore ({ useStore, storeKey, storeCheck, storeCheckKey, storeSign, dataCheck }) {
+  useStore = useStore ? store.enabled : false
+  if (useStore) {
+    const storeData = store.get(storeKey)
+    storeCheck = storeCheck || storeCheckFn
+    if (storeCheck(storeData, storeCheckKey, storeSign)) {
+      if (!dataCheck || (storeData && dataCheck && false !== dataCheck(storeData))) {
+        return storeData
+      }
+    }
+  }
+  return null
+}
+
+function getDataFromStoreWithoutCheck ({ useStore, storeKey, dataCheck }) {
+  useStore = useStore ? store.enabled : false
+  if (useStore) {
+    const storeData = store.get(storeKey)
+    if (!dataCheck || (storeData && dataCheck && false !== dataCheck(storeData))) {
+      return storeData
+    }
+  }
+  return null
+}
+
+function setDataToStore ({ useStore, storeKey, data }) {
+  useStore = useStore ? store.enabled : false
+  if (useStore) {
+    store.set(storeKey, data)
+  }
+}
+
+function fallback (url, opts, cb) {
   const backup = opts.backup
   if (backup) {
-    if (Array.isArray(backup) && backup.length) {
-      return fetchData(backup.shift(), opts, cb)
+    if (typeof backup === 'string') {
+      delete opts.backup
+      return fetchData(backup, opts, cb)
+    } else if (Array.isArray(backup)) {
+      if (backup.length) {
+        return fetchData(backup.shift(), opts, cb)
+      }
     }
-    delete opts.backup
-    return fetchData(backup, opts, cb)
+  }
+  // no backup to use, try to get data from store
+  const dataFromStoreWithoutCheck = getDataFromStoreWithoutCheck({
+    useStore: opts.useStore,
+    storeKey: url,
+    dataCheck: opts.dataCheck
+  })
+  if (dataFromStoreWithoutCheck) {
+    cb(null, dataFromStoreWithoutCheck)
+    return true
   }
   return false
 }
