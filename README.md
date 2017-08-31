@@ -16,12 +16,32 @@ Happy to use!😘🤡
 
 ## Installation
 
-Install with npm or yarn
+If you use webpack or browserify, you can install this package with npm or yarn
 
 ``` bash
-npm install jsonp-retry --save
-
 yarn add jsonp-retry
+```
+
+or
+
+``` bash
+yarn add jsonp-retry
+```
+
+Then require and use it
+
+```javascript
+
+import jsonp from 'jsonp-retry'
+
+jsonp('//example.com/xxx', {
+  timeout: 3000
+}, function (err, data) {
+  if (err) {
+    throw err
+  }
+  // Todo with data
+})
 ```
 
 ## Usage
