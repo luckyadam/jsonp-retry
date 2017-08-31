@@ -7,10 +7,10 @@ const babelConfig = JSON.parse(String(fs.readFileSync('.babelrc')))
 babelConfig.plugins.push('external-helpers')
 
 export default {
-  name: 'jsonp-retry',
+  name: 'jsonp',
   input: 'index.js',
   output: {
-    file: 'dist/jsonp-retry.dev.js',
+    file: 'dist/jsonp.dev.js',
     format: 'umd',
     sourcemap: true
   },

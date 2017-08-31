@@ -2,7 +2,7 @@
   "name": "jsonp-retry",
   "version": "0.0.2",
   "description": "A simple jsonp with retry and storage",
-  "main": "dist/jsonp-retry.js",
+  "main": "dist/jsonp.js",
   "scripts": {
     "clear": "rm -rf dist",
     "eslint": "eslint src test",
@@ -13,8 +13,8 @@
     "build": "npm-run-all clear transpile optimize minify",
     "transpile:main": "rollup -c rollup.config.js",
     "transpile": "npm-run-all transpile:main",
-    "optimize": "uglifyjs dist/jsonp-retry.dev.js -c properties=false,conditionals=false,sequences=false,loops=false,join_vars=false,collapse_vars=false --pure-funcs=Object.defineProperty -b width=120,quote_style=3 -o dist/jsonp-retry.js -p relative --in-source-map dist/jsonp-retry.dev.js.map --source-map dist/jsonp-retry.js.map",
-    "minify": "uglifyjs dist/jsonp-retry.js -c properties=false,collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code -m -o dist/jsonp-retry.min.js -p relative --in-source-map dist/jsonp-retry.js.map --source-map dist/jsonp-retry.min.js.map",
+    "optimize": "uglifyjs dist/jsonp.dev.js -c properties=false,conditionals=false,sequences=false,loops=false,join_vars=false,collapse_vars=false --pure-funcs=Object.defineProperty -b width=120,quote_style=3 -o dist/jsonp.js -p relative --in-source-map dist/jsonp.dev.js.map --source-map dist/jsonp.js.map",
+    "minify": "uglifyjs dist/jsonp.js -c properties=false,collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code -m -o dist/jsonp.min.js -p relative --in-source-map dist/jsonp.js.map --source-map dist/jsonp.min.js.map",
     "release": "npm run build && npm test && release-it -n -p"
   },
   "repository": {
