@@ -20,7 +20,7 @@ const defaultConfig = {
   params: {},
   jsonp: 'callback',
   name: null,
-  cache: true,
+  cache: false,
   useStore: false,
   storeCheck: null,
   storeSign: null,

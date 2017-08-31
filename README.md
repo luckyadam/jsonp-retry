@@ -8,7 +8,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/luckyadam/jsonp-retry.svg?style=flat-square)](https://coveralls.io/github/luckyadam/jsonp-retry?branch=master)
 [![npm](https://img.shields.io/npm/dw/jsonp-retry.svg?style=flat-square)](https://www.npmjs.com/package/jsonp-retry)
 
-A simple implementation of jsonp, it provides timeout and retry function, then the main request is failed because of timeout, there will be many retries.
+A simple implementation of jsonp, it provides timeout and retry function, when the main request is failed because of timeout, there will be many retries.
 
 And the surprise was, you can store the response data to localStorage with **jsonp-retry** automatically, and then it can get the data from localStorage without request from network if it detects the store data is available.Of course, you can custom the store check rule.You will learn how to use this function from the below.
 
@@ -35,7 +35,7 @@ yarn add jsonp-retry
   * `jsonp`(`String`): appoint the jsonp request url key (defaults to `callback`)
   * `name`(`String`): appoint the jsonp callback function (defaults to a string with prefix '__jsonp' and current time stamp like `__jsonp1504108585883` )
   * `params`(`String` or `Object`): appoint the jsonp request url params, it can be a query string like `a=1&b=2&c=3` , or it can be an object like `{ a: 1, b: 2 }` ,it will transform to a query string
-  * `cache`(`Boolean`): appoint the jsonp request url whether to be cached (defaults to `true`)
+  * `cache`(`Boolean`): appoint the jsonp request url whether to be cached (defaults to `false`)
   * `timeout`(`Number`): how long after a timeout error is emitted (defaults to `2000ms`)
   * `retryTimes`(`Number`): when the request is timeout it can appoint how many times to retry (defaults to `2`)
   * `backup`(`String` or `Array`): appoint a backup url or multiple backup urls, if the url param request is failed, it will use backup url(s) to get backup data for correct display

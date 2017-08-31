@@ -8,3 +8,4 @@ node_modules/
 jspm_packages/
 coverage/
 dist/
+.DS_Store
