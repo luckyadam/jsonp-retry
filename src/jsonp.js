@@ -29,7 +29,6 @@ const defaultConfig = {
   charset: 'UTF-8'
 }
 
-let timer
 let script
 
 function jsonp (url, opts, cb) {
@@ -86,9 +85,10 @@ function fetchData (url, opts, cb) {
   if (!opts.cache) {
     url += `&_=${new Date().getTime()}`
   }
+
   const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
   // when timeout, will try to retry
-  timer = setTimeout(() => {
+  const timer = setTimeout(() => {
     cleanup(funcId)
     // no retryTimes left, go to backup
     if (typeof opts.retryTimes === 'number' && opts.retryTimes > 0) {
@@ -99,6 +99,16 @@ function fetchData (url, opts, cb) {
       return cb(new Error('Timeout and no data return'))
     }
   }, timeout)
+
+  function cleanup (funcId) {
+    if (script.parentNode) {
+      script.parentNode.removeChild(script)
+    }
+    win[funcId] = noop
+    if (timer) {
+      clearTimeout(timer)
+    }
+  }
 
   win[funcId] = function (data) {
     cleanup(funcId)
@@ -193,16 +203,6 @@ function fallback (url, opts, cb) {
     return true
   }
   return false
-}
-
-function cleanup (funcId) {
-  if (script.parentNode) {
-    script.parentNode.removeChild(script)
-  }
-  win[funcId] = noop
-  if (timer) {
-    clearTimeout(timer)
-  }
 }
 
 export function appendScriptTagToHead ({ url, charset }) {
