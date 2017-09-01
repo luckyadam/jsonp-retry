@@ -19,7 +19,7 @@ Happy to use!😘🤡
 If you use webpack or browserify, you can install this package with npm or yarn
 
 ``` bash
-yarn add jsonp-retry
+npm install jsonp-retry --save
 ```
 
 or
