@@ -81,7 +81,7 @@ function fetchData (url, opts, cb) {
   const charset = opts.charset
   const funcId = opts.name || `__jsonp${new Date().getTime()}`
   url = generateJsonpUrlWithParams(url, opts.params)
-  url += (~url.lastIndexOf('&') ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
+  url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
   if (!opts.cache) {
     url += `&_=${new Date().getTime()}`
   }
