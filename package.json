@@ -24,6 +24,13 @@
   "keywords": [
     "jsonp"
   ],
+  "files": [
+    "README.md",
+    "LICENSE",
+    "src",
+    "dist",
+    "index.js"
+  ],
   "author": "luckyadam",
   "license": "MIT",
   "bugs": {
