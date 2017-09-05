@@ -1,9 +1,14 @@
 import assign from 'object-assign'
 
-import { serializeParams } from './lib'
+import { serializeParams, isFunction } from './lib'
 import store from './store'
 
 const win = window
+
+const canUsePromise = (function () {
+  return 'Promise' in win &&
+    typeof isFunction(Promise)
+})()
 
 const noop = function () {}
 
@@ -32,7 +37,7 @@ const defaultConfig = {
 let script
 
 function jsonp (url, opts, cb) {
-  if (typeof url === 'function') {
+  if (isFunction(url)) {
     cb = url
     opts = {}
   } else if (url && typeof url === 'object') {
@@ -40,7 +45,7 @@ function jsonp (url, opts, cb) {
     opts = url || {}
     url = opts.url
   }
-  if (typeof opts === 'function') {
+  if (isFunction(opts)) {
     cb = opts
     opts = {}
   }
@@ -49,8 +54,15 @@ function jsonp (url, opts, cb) {
   }
   opts = assign({}, defaultConfig, opts)
   url = url || opts.url
+  cb = cb || noop
   if (!url || typeof url !== 'string') {
-    return cb(new Error('Param url is needed!'))
+    cb(new Error('Param url is needed!'))
+    if (!jsonp.promiseClose && canUsePromise) {
+      return new Promise((resolve, reject) => {
+        return reject(new Error('Param url is needed!'))
+      })
+    }
+    return
   }
   const originalUrl = generateJsonpUrlWithParams(url, opts.params)
   // first get data from store
@@ -63,9 +75,25 @@ function jsonp (url, opts, cb) {
     dataCheck: opts.dataCheck
   })
   if (datafromStore) {
-    return cb(null, datafromStore)
+    cb(null, datafromStore)
+    if (!jsonp.promiseClose && canUsePromise) {
+      return new Promise(resolve => {
+        return resolve(datafromStore)
+      })
+    }
+    return
   }
   opts.originalUrl = originalUrl
+  if (!jsonp.promiseClose && canUsePromise) {
+    return new Promise((resolve, reject) => {
+      fetchData(url, opts, (err, data) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(data)
+      })
+    })
+  }
   fetchData(url, opts, cb)
 }
 
