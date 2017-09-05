@@ -44,11 +44,28 @@ jsonp('//example.com/xxx', {
 })
 ```
 
+or use in Promise way
+
+```javascript
+
+import jsonp from 'jsonp-retry'
+
+jsonp('//example.com/xxx', {
+  timeout: 3000
+}).then(data => {
+  // Todo with data
+}).catch(err => {
+  throw err
+})
+```
+
 ## Usage
 
-**jsonp-retry** provides a flexible way of using it, usually it accept 3 arguments like
+**jsonp-retry** provides a flexible way of using it, usually you can pass an callback to process the request result, and more elegantly, if your environment support [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), you can use **jsonp-retry** in Promise way.
 
-### jsonp(url, opts, cb)
+Usually it accept 3 arguments, `url`、`opts`、`cb`, of course `cb` is not required.It will return an instance of Promise if your environment support.
+
+### jsonp(url, opts, cb?)
 
 * `url`(`String`): the url to fetch data
 * `opts`(`Object`): optional, config the jsonp method
@@ -69,7 +86,7 @@ jsonp('//example.com/xxx', {
 
 In the same way, you can put the first `url` argument into `opts`, so there will only need to pass only 2 arguments like
 
-### jsonp(opts, cb)
+### jsonp(opts, cb?)
 
 * `opts`(`Object`): optional, config the jsonp method
   * `url`(`String`): the url to fetch data
