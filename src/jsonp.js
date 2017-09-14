@@ -88,8 +88,10 @@ function jsonp (url, opts, cb) {
     return new Promise((resolve, reject) => {
       fetchData(url, opts, (err, data) => {
         if (err) {
+          cb(err)
           return reject(err)
         }
+        cb(null, data)
         resolve(data)
       })
     })

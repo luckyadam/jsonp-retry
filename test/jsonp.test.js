@@ -5,7 +5,7 @@ const TEST_URL = '//json.diao.li/getjson/59a5671ee6da184a056ce9ae'
 const BACKUP_URL1 = '//json.diao.li/getjson/59a66a9fe6da184a056ce9af'
 const BACKUP_URL2 = '//json.diao.li/getjson/59a67cd3e6da184a056ce9b0'
 const TIMEOUT_UTL = '//json.diao.li/getjson/59a685ade6da184a056ce9b1'
-const STORE_TEST_URL = '//json.diao.li/getjson/59a6b863e6da184a056ce9b2'
+const STORE_TEST_URL = '//json.diao.li/getjson/59ba2399e6da184a056ce9e2'
 
 describe('jsonp', function () {
   this.timeout(2000000)
@@ -197,7 +197,7 @@ describe('jsonp', function () {
 
     it('not use store if storeSign is not correct', (done) => {
       store.clear()
-      store.set(STORE_TEST_URL, {
+      store.set(`${STORE_TEST_URL}?`, {
         'code': 1,
         'version': 'yyyyy',
         'data': {
@@ -220,7 +220,7 @@ describe('jsonp', function () {
 
     it('not use store if dataCheck fail', (done) => {
       store.clear()
-      store.set(STORE_TEST_URL, {
+      store.set(`${STORE_TEST_URL}?`, {
         'code': 1,
         'version': 'yyyyy',
         'data': {
