@@ -124,7 +124,7 @@ function fetchData (url, opts, cb) {
     // no retryTimes left, go to backup
     if (typeof opts.retryTimes === 'number' && opts.retryTimes > 0) {
       opts.retryTimes--
-      return fetchData(url, opts, cb)
+      return fetchData(originalUrl, opts, cb)
     }
     if (fallback(originalUrl, opts, cb) === false) {
       return cb(new Error('Timeout and no data return'))
