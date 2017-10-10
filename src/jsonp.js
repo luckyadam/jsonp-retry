@@ -35,6 +35,7 @@ const defaultConfig = {
 }
 
 let script
+let timestamp = new Date().getTime()
 
 function jsonp (url, opts, cb) {
   if (isFunction(url)) {
@@ -109,7 +110,7 @@ function generateJsonpUrlWithParams (url, params) {
 function fetchData (url, opts, cb) {
   const originalUrl = opts.originalUrl
   const charset = opts.charset
-  const funcId = opts.name || `__jsonp${new Date().getTime()}`
+  const funcId = opts.name || `__jsonp${timestamp++}`
   url = generateJsonpUrlWithParams(url, opts.params)
   url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
   if (!opts.cache) {
