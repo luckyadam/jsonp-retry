@@ -4,7 +4,6 @@ import babel from 'rollup-plugin-babel'
 import fs from 'fs'
 
 const babelConfig = JSON.parse(String(fs.readFileSync('.babelrc')))
-babelConfig.plugins.push('external-helpers')
 
 export default {
   name: 'jsonp',
