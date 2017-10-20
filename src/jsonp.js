@@ -65,11 +65,11 @@ function jsonp (url, opts, cb) {
     }
     return
   }
-  const originalUrl = generateJsonpUrlWithParams(url, opts.params)
+  const urlWithParams = generateJsonpUrlWithParams(url, opts.params)
   // first get data from store
   const datafromStore = getDataFromStore({
     useStore: opts.useStore,
-    storeKey: originalUrl,
+    storeKey: urlWithParams,
     storeCheck: opts.storeCheck,
     storeCheckKey: opts.storeCheckKey,
     storeSign: opts.storeSign,
@@ -84,10 +84,10 @@ function jsonp (url, opts, cb) {
     }
     return
   }
-  opts.originalUrl = originalUrl
+  opts.originalUrl = urlWithParams
   if (!jsonp.promiseClose && canUsePromise) {
     return new Promise((resolve, reject) => {
-      fetchData(url, opts, (err, data) => {
+      fetchData(urlWithParams, opts, (err, data) => {
         if (err) {
           cb(err)
           return reject(err)
@@ -97,7 +97,7 @@ function jsonp (url, opts, cb) {
       })
     })
   }
-  fetchData(url, opts, cb)
+  fetchData(urlWithParams, opts, cb)
 }
 
 function generateJsonpUrlWithParams (url, params) {
@@ -111,7 +111,6 @@ function fetchData (url, opts, cb) {
   const originalUrl = opts.originalUrl
   const charset = opts.charset
   const funcId = opts.name || `__jsonp${timestamp++}`
-  url = generateJsonpUrlWithParams(url, opts.params)
   url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
   if (!opts.cache) {
     url += `&_=${new Date().getTime()}`
@@ -213,13 +212,16 @@ function setDataToStore ({ useStore, storeKey, data }) {
 
 function fallback (url, opts, cb) {
   const backup = opts.backup
+  let backupWithParams
   if (backup) {
     if (typeof backup === 'string') {
       delete opts.backup
-      return fetchData(backup, opts, cb)
+      backupWithParams = generateJsonpUrlWithParams(backup, opts.params)
+      return fetchData(backupWithParams, opts, cb)
     } else if (Array.isArray(backup)) {
       if (backup.length) {
-        return fetchData(backup.shift(), opts, cb)
+        backupWithParams = generateJsonpUrlWithParams(backup.shift(), opts.params)
+        return fetchData(backupWithParams, opts, cb)
       }
     }
   }
