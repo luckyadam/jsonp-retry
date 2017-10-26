@@ -1,6 +1,6 @@
 import assign from 'object-assign'
 
-import { serializeParams, isFunction } from './lib'
+import { serializeParams, isFunction, getUrlQueryParamByName, updateQueryStringParamByName } from './lib'
 import store from './store'
 
 const win = window
@@ -111,7 +111,14 @@ function fetchData (url, opts, cb) {
   const originalUrl = opts.originalUrl
   const charset = opts.charset
   const funcId = opts.name || `__jsonp${timestamp++}`
-  url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
+  const jsonpUrlQueryParam = getUrlQueryParamByName(url, opts.jsonp)
+  if (jsonpUrlQueryParam) {
+    if (jsonpUrlQueryParam === '?') {
+      updateQueryStringParamByName(url, opts.jsonp, encodeC(funcId))
+    }
+  } else {
+    url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
+  }
   if (!opts.cache) {
     url += `&_=${new Date().getTime()}`
   }
