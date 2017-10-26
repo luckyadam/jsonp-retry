@@ -114,7 +114,7 @@ function fetchData (url, opts, cb) {
   const jsonpUrlQueryParam = getUrlQueryParamByName(url, opts.jsonp)
   if (jsonpUrlQueryParam) {
     if (jsonpUrlQueryParam === '?') {
-      updateQueryStringParamByName(url, opts.jsonp, encodeC(funcId))
+      url = updateQueryStringParamByName(url, opts.jsonp, encodeC(funcId))
     }
   } else {
     url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
