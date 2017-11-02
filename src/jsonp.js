@@ -112,6 +112,7 @@ function fetchData (url, opts, cb) {
   const charset = opts.charset
   const funcId = opts.name || `__jsonp${timestamp++}`
   const jsonpUrlQueryParam = getUrlQueryParamByName(url, opts.jsonp)
+  const gotoBackupInfo = arguments[3] || null
   if (jsonpUrlQueryParam) {
     if (jsonpUrlQueryParam === '?') {
       url = updateQueryStringParamByName(url, opts.jsonp, encodeC(funcId))
@@ -149,6 +150,9 @@ function fetchData (url, opts, cb) {
 
   win[funcId] = function (data) {
     cleanup(funcId)
+    if (gotoBackupInfo) {
+      data.__$$backupCall = gotoBackupInfo
+    }
     if (opts.dataCheck) {
       if (opts.dataCheck(data) !== false) {
         // write data to store
@@ -224,11 +228,16 @@ function fallback (url, opts, cb) {
     if (typeof backup === 'string') {
       delete opts.backup
       backupWithParams = generateJsonpUrlWithParams(backup, opts.params)
-      return fetchData(backupWithParams, opts, cb)
+      return fetchData(backupWithParams, opts, cb, {
+        backup
+      })
     } else if (Array.isArray(backup)) {
       if (backup.length) {
-        backupWithParams = generateJsonpUrlWithParams(backup.shift(), opts.params)
-        return fetchData(backupWithParams, opts, cb)
+        const backupUrl = backup.shift()
+        backupWithParams = generateJsonpUrlWithParams(backupUrl, opts.params)
+        return fetchData(backupWithParams, opts, cb, {
+          backup: backupUrl
+        })
       }
     }
   }
