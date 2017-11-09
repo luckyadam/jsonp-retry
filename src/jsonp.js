@@ -34,7 +34,6 @@ const defaultConfig = {
   charset: 'UTF-8'
 }
 
-let script
 let timestamp = new Date().getTime()
 
 function jsonp (url, opts, cb) {
@@ -124,30 +123,6 @@ function fetchData (url, opts, cb) {
     url += `&_=${new Date().getTime()}`
   }
 
-  const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
-  // when timeout, will try to retry
-  const timer = setTimeout(() => {
-    cleanup(funcId)
-    // no retryTimes left, go to backup
-    if (typeof opts.retryTimes === 'number' && opts.retryTimes > 0) {
-      opts.retryTimes--
-      return fetchData(originalUrl, opts, cb)
-    }
-    if (fallback(originalUrl, opts, cb) === false) {
-      return cb(new Error('Timeout and no data return'))
-    }
-  }, timeout)
-
-  function cleanup (funcId) {
-    if (script.parentNode) {
-      script.parentNode.removeChild(script)
-    }
-    win[funcId] = noop
-    if (timer) {
-      clearTimeout(timer)
-    }
-  }
-
   win[funcId] = function (data) {
     cleanup(funcId)
     if (gotoBackupInfo) {
@@ -176,10 +151,34 @@ function fetchData (url, opts, cb) {
       cb(null, data)
     }
   }
-  appendScriptTagToHead({
+  const script = appendScriptTagToHead({
     url,
     charset
   })
+
+  const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
+  // when timeout, will try to retry
+  const timer = setTimeout(() => {
+    cleanup(funcId)
+    // no retryTimes left, go to backup
+    if (typeof opts.retryTimes === 'number' && opts.retryTimes > 0) {
+      opts.retryTimes--
+      return fetchData(originalUrl, opts, cb)
+    }
+    if (fallback(originalUrl, opts, cb) === false) {
+      return cb(new Error('Timeout and no data return'))
+    }
+  }, timeout)
+
+  function cleanup (funcId) {
+    if (script.parentNode) {
+      script.parentNode.removeChild(script)
+    }
+    win[funcId] = noop
+    if (timer) {
+      clearTimeout(timer)
+    }
+  }
 }
 
 function storeCheckFn (storeData, storeCheckKey, storeSign) {
@@ -255,13 +254,14 @@ function fallback (url, opts, cb) {
 }
 
 export function appendScriptTagToHead ({ url, charset }) {
-  script = doc.createElement('script')
+  const script = doc.createElement('script')
   script.type = 'text/javascript'
   if (charset) {
     script.charset = charset
   }
   script.src = url
   head.appendChild(script)
+  return script
 }
 
 export default jsonp
