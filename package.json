@@ -1,6 +1,6 @@
 {
   "name": "jsonp-retry",
-  "version": "0.1.6",
+  "version": "1.0.0",
   "description": "A simple jsonp with retry and storage",
   "main": "dist/jsonp.js",
   "scripts": {
@@ -19,7 +19,10 @@
     "release": "npm run build && npm test && release-it -n -p"
   },
   "lint-staged": {
-    "*.js": ["eslint --fix", "git add"]
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
