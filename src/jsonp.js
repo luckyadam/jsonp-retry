@@ -3,7 +3,7 @@ import assign from 'object-assign'
 import { serializeParams, isFunction, getUrlQueryParamByName, updateQueryStringParamByName } from './lib'
 import store from './store'
 
-const win = window
+const win = typeof window !== 'undefined' ? window : global
 
 const canUsePromise = (function () {
   return 'Promise' in win &&
@@ -13,8 +13,8 @@ const canUsePromise = (function () {
 const noop = function () {}
 
 const encodeC = encodeURIComponent
-const doc = document
-const head = doc.head || doc.getElementsByTagName('head')[0]
+const doc = win.document
+const head = doc ? (doc.head || doc.getElementsByTagName('head')[0]) : null
 
 const TIMEOUT_CONST = 2000
 
@@ -254,6 +254,9 @@ function fallback (url, opts, cb) {
 }
 
 export function appendScriptTagToHead ({ url, charset }) {
+  if (!doc) {
+    return
+  }
   const script = doc.createElement('script')
   script.type = 'text/javascript'
   if (charset) {
