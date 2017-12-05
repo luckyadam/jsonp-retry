@@ -5,17 +5,21 @@
   "main": "dist/jsonp.js",
   "scripts": {
     "clear": "rm -rf dist",
-    "eslint": "eslint src test",
-    "eslint:fix": "eslint src test --fix",
+    "precommit": "lint-staged",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
     "test:karma": "karma start karma.conf.js --single-run",
     "test:karma:watch": "npm run test:karma -- no-single-run",
-    "test": "npm-run-all eslint test:karma",
+    "test": "npm-run-all lint test:karma",
     "build": "npm-run-all clear transpile optimize minify",
     "transpile:main": "rollup -c rollup.config.js",
     "transpile": "npm-run-all transpile:main",
     "optimize": "uglifyjs dist/jsonp.dev.js -c properties=false,conditionals=false,sequences=false,loops=false,join_vars=false,collapse_vars=false --pure-funcs=Object.defineProperty -b width=120,quote_style=3 -o dist/jsonp.js -p relative --in-source-map dist/jsonp.dev.js.map --source-map dist/jsonp.js.map",
     "minify": "uglifyjs dist/jsonp.js -c properties=false,collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code -m -o dist/jsonp.min.js -p relative --in-source-map dist/jsonp.js.map --source-map dist/jsonp.min.js.map",
     "release": "npm run build && npm test && release-it -n -p"
+  },
+  "lint-staged": {
+    "*.js": ["eslint --fix", "git add"]
   },
   "repository": {
     "type": "git",
@@ -53,6 +57,7 @@
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "husky": "^0.14.3",
     "istanbul-instrumenter-loader": "^3.0.0",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -64,6 +69,7 @@
     "karma-source-map-support": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
+    "lint-staged": "^6.0.0",
     "mocha": "^3.5.0",
     "npm-run-all": "^4.1.1",
     "release-it": "^2.8.5",
