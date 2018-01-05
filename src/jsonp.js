@@ -123,7 +123,11 @@ function fetchData (url, opts, cb) {
     url += `&_=${new Date().getTime()}`
   }
 
+  // move prev callback into next when fetch parallel with same funcId
+  clearTimeout(win['timer_' + funcId])
+  const prevFunc = win[funcId]
   win[funcId] = function (data) {
+    prevFunc && prevFunc(data)
     cleanup(funcId)
     if (gotoBackupInfo) {
       data.__$$backupCall = gotoBackupInfo
@@ -158,7 +162,7 @@ function fetchData (url, opts, cb) {
 
   const timeout = opts.timeout != null ? opts.timeout : TIMEOUT_CONST
   // when timeout, will try to retry
-  const timer = setTimeout(() => {
+  win['timer_' + funcId] = setTimeout(() => {
     cleanup(funcId)
     // no retryTimes left, go to backup
     if (typeof opts.retryTimes === 'number' && opts.retryTimes > 0) {
@@ -175,9 +179,7 @@ function fetchData (url, opts, cb) {
       script.parentNode.removeChild(script)
     }
     win[funcId] = noop
-    if (timer) {
-      clearTimeout(timer)
-    }
+    clearTimeout(win['timer_' + funcId])
   }
 }
 
