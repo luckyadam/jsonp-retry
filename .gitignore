@@ -9,3 +9,5 @@ jspm_packages/
 coverage/
 dist/
 .DS_Store
+
+.idea
