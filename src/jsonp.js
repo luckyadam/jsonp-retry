@@ -109,8 +109,8 @@ function generateJsonpUrlWithParams (url, params) {
 function fetchData (url, opts, cb) {
   const originalUrl = opts.originalUrl
   const charset = opts.charset
-  const funcId = opts.name || `__jsonp${timestamp++}`
   const jsonpUrlQueryParam = getUrlQueryParamByName(url, opts.jsonp)
+  const funcId = (jsonpUrlQueryParam === '?' ? false : jsonpUrlQueryParam) || opts.name || `__jsonp${timestamp++}`
   const gotoBackupInfo = arguments[3] || null
   if (jsonpUrlQueryParam) {
     if (jsonpUrlQueryParam === '?') {
@@ -120,7 +120,7 @@ function fetchData (url, opts, cb) {
     url += (url.split('').pop() === '&' ? '' : '&') + `${opts.jsonp}=${encodeC(funcId)}`
   }
   if (!opts.cache) {
-    url += `&_=${new Date().getTime()}`
+    url += (url.split('').pop() === '&' ? '' : '&') + `_=${new Date().getTime()}`
   }
 
   // move prev callback into next when fetch parallel with same funcId
