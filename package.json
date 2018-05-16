@@ -3,6 +3,8 @@
   "version": "1.0.2",
   "description": "A simple jsonp with retry and storage",
   "main": "dist/jsonp.js",
+  "module": "dist/jsonp.esm.js",
+  "jsnext:main": "dist/jsonp.esm.js",
   "scripts": {
     "clear": "rm -rf dist",
     "precommit": "lint-staged",
