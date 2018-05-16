@@ -1,6 +1,6 @@
 {
   "name": "jsonp-retry",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple jsonp with retry and storage",
   "main": "dist/jsonp.js",
   "module": "dist/jsonp.esm.js",
